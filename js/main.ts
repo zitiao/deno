@@ -28,7 +28,29 @@ window["denoMain"] = () => {
     const arg = msg.startArgv(i);
     deno.print(`argv[${i}] ${arg}`);
   }
+
+  bench();
 };
+
+function bench() {
+  const transceive = deno.transceive;
+  const ab1 = new ArrayBuffer(3000);
+  const ab2 = new ArrayBuffer(4000);
+  const ab3 = new ArrayBuffer(4000);
+
+  for (;;) {
+    const start = Date.now();
+    const count = 25e6;
+
+    for (let i = 0; i < count; i++) {
+      transceive(ab1, ab2, ab3);
+    }
+
+    const elapsed = (Date.now() - start) / 1000;
+    const tput = count / elapsed;
+    deno.print(`time: ${elapsed}s, tput: ${tput}t/s`);
+  }
+}
 
 function typedArrayToArrayBuffer(ta: Uint8Array): ArrayBuffer {
   return ta.buffer.slice(

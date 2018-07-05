@@ -29,9 +29,11 @@ struct InternalFieldData {
 void Print(const v8::FunctionCallbackInfo<v8::Value>& args);
 void Recv(const v8::FunctionCallbackInfo<v8::Value>& args);
 void Send(const v8::FunctionCallbackInfo<v8::Value>& args);
+void Transceive(const v8::FunctionCallbackInfo<v8::Value>& args);
 static intptr_t external_references[] = {reinterpret_cast<intptr_t>(Print),
                                          reinterpret_cast<intptr_t>(Recv),
-                                         reinterpret_cast<intptr_t>(Send), 0};
+                                         reinterpret_cast<intptr_t>(Send),
+                                         reinterpret_cast<intptr_t>(Transceive), 0};
 
 Deno* NewFromSnapshot(void* data, deno_recv_cb cb);
 

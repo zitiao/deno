@@ -163,6 +163,42 @@ void Send(const v8::FunctionCallbackInfo<v8::Value>& args) {
   d->currentArgs = nullptr;
 }
 
+volatile uint32_t bla;
+
+void Transceive(const v8::FunctionCallbackInfo<v8::Value>& args) {
+  v8::Isolate* isolate = args.GetIsolate();
+  Deno* d = static_cast<Deno*>(isolate->GetData(0));
+  DCHECK_EQ(d->isolate, isolate);
+
+  //v8::Locker locker(d->isolate);
+  v8::EscapableHandleScope handle_scope(isolate);
+
+  auto argc = args.Length();
+  for (auto i = 1; i < argc; i++) {
+    v8::Local<v8::Value> ab_v = args[i];
+    CHECK(ab_v->IsArrayBuffer());
+
+    auto ab = v8::Local<v8::ArrayBuffer>::Cast(ab_v);
+
+    // auto id = nullptr; ab->GetAlignedPointerFromInternalField(0);
+    auto id =
+        0;  // v8::Local<v8::Integer>::Cast(ab->GetInternalField(0))->Int32Value();
+    if (id == 0) {
+      // ab->SetAlignedPointerInInternalField(0, d);
+      auto contents = ab->IsExternal() ? ab->GetContents() : ab->Externalize();
+      (void) &contents;
+      const uint32_t* ptr = static_cast<uint32_t*>(contents.AllocationBase());
+      bla = *ptr;
+    } else {
+      if (!ab->IsExternal())
+        abort();
+    }
+  }
+
+
+  args.GetReturnValue().Set(args[1]);
+}
+
 bool Execute(v8::Local<v8::Context> context, const char* js_filename,
              const char* js_source) {
   auto* isolate = context->GetIsolate();
@@ -218,6 +254,10 @@ void InitializeContext(v8::Isolate* isolate, v8::Local<v8::Context> context,
   auto send_tmpl = v8::FunctionTemplate::New(isolate, Send);
   auto send_val = send_tmpl->GetFunction(context).ToLocalChecked();
   CHECK(deno_val->Set(context, deno::v8_str("send"), send_val).FromJust());
+
+  auto transceive_tmpl = v8::FunctionTemplate::New(isolate, Transceive);
+  auto transceive_val = transceive_tmpl->GetFunction(context).ToLocalChecked();
+  CHECK(deno_val->Set(context, deno::v8_str("transceive"), transceive_val).FromJust());
 
   bool r = Execute(context, js_filename, js_source);
   CHECK(r);
