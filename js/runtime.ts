@@ -22,8 +22,8 @@ const EOL = "\n";
 export type AmdFactory = (...args: any[]) => undefined | object;
 export type AmdDefine = (deps: string[], factory: AmdFactory) => void;
 
-// Uncaught exceptions are sent to window.onerror by v8worker2.
-// https://git.io/vhOsf
+/*
+// Uncaught exceptions are sent to window.onerror by the privlaged binding.
 window.onerror = (message, source, lineno, colno, error) => {
   // TODO Currently there is a bug in v8_source_maps.ts that causes a segfault
   // if it is used within window.onerror. To workaround we uninstall the
@@ -33,6 +33,7 @@ window.onerror = (message, source, lineno, colno, error) => {
   console.log(error.message, error.stack);
   os.exit(1);
 };
+*/
 
 /*
 export function setup(mainJs: string, mainMap: string): void {
@@ -81,6 +82,7 @@ export class FileModule {
   }
 
   compileAndRun(): void {
+    util.log("compileAndRun", this.sourceCode);
     if (!this.outputCode) {
       // If there is no cached outputCode, then compile the code.
       util.assert(
@@ -91,7 +93,6 @@ export class FileModule {
       this.outputCode = compiler.compile(this.fileName);
       os.codeCache(this.fileName, this.sourceCode, this.outputCode);
     }
-    util.log("compileAndRun", this.sourceCode);
     execute(this.fileName, this.outputCode);
   }
 
@@ -144,17 +145,11 @@ export function resolveModule(
   moduleSpecifier: string,
   containingFile: string
 ): null | FileModule {
-  //util.log("resolveModule", { moduleSpecifier, containingFile });
+  util.log("resolveModule", { moduleSpecifier, containingFile });
   util.assert(moduleSpecifier != null && moduleSpecifier.length > 0);
   // We ask golang to sourceCodeFetch. It will load the sourceCode and if
   // there is any outputCode cached, it will return that as well.
-  let fetchResponse;
-  try {
-    fetchResponse = os.codeFetch(moduleSpecifier, containingFile);
-  } catch (e) {
-    // TODO Only catch "no such file or directory" errors. Need error codes.
-    return null;
-  }
+	const fetchResponse = os.codeFetch(moduleSpecifier, containingFile);
   const { filename, sourceCode, outputCode } = fetchResponse;
   if (sourceCode.length === 0) {
     return null;

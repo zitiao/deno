@@ -3,6 +3,7 @@
 import { ModuleInfo } from "./types";
 import { deno as fbs } from "./msg_generated";
 import { assert, typedArrayToArrayBuffer  } from "./util";
+import { flatbuffers } from "flatbuffers";
 
 export function exit(exitCode = 0): void {
   assert(false, "Not Implemented");
@@ -18,22 +19,38 @@ export function codeFetch(
   moduleSpecifier: string,
   containingFile: string
 ): ModuleInfo {
-  assert(false, "Not Implemented");
-  return null;
-  /*
-  const res = pubInternal("os", {
-    command: fbs.Command.CODE_FETCH,
-    codeFetchModuleSpecifier: moduleSpecifier,
-    codeFetchContainingFile: containingFile
-  });
-  assert(res.command === fbs.Command.CODE_FETCH_RES);
+  console.log("Hello from codeFetch");
+
+  // Send CodeFetch message
+  const builder = new flatbuffers.Builder();
+  const moduleSpecifier_ = builder.createString(moduleSpecifier);
+  const containingFile_ = builder.createString(containingFile);
+  fbs.CodeFetch.startCodeFetch(builder);
+  fbs.CodeFetch.addModuleSpecifier(builder, moduleSpecifier_);
+  fbs.CodeFetch.addContainingFile(builder, containingFile_);
+  const msg = fbs.CodeCache.endCodeCache(builder);
+  fbs.Base.startBase(builder);
+  fbs.Base.addMsg(builder, msg);
+  const base = fbs.Base.endBase(builder);
+  // Maybe need to do another step?
+  // Base.finishBaseBuffer(builder, base);
+	const payload = typedArrayToArrayBuffer(builder.asUint8Array());
+  const resBuf = deno.send("x", payload);
+
+  console.log("CodeFetch sent");
+
+  // Process CodeFetchRes
+  const bb = new flatbuffers.ByteBuffer(new Uint8Array(resBuf));
+  const baseRes = fbs.Base.getRootAsBase(bb);
+  assert(fbs.Any.CodeFetchRes === baseRes.msgType());
+  const codeFetchRes = new fbs.CodeFetchRes();
+  assert(baseRes.msg(codeFetchRes) != null);
   return {
-    moduleName: res.codeFetchResModuleName,
-    filename: res.codeFetchResFilename,
-    sourceCode: res.codeFetchResSourceCode,
-    outputCode: res.codeFetchResOutputCode
-  };
-  */
+    moduleName: codeFetchRes.moduleName(),
+    filename: codeFetchRes.filename(),
+    sourceCode: codeFetchRes.sourceCode(),
+    outputCode: codeFetchRes.outputCode(),
+  }
 }
 
 export function codeCache(
@@ -41,7 +58,7 @@ export function codeCache(
   sourceCode: string,
   outputCode: string
 ): void {
-  const builder = new flatbuffers.Builder(512);
+  const builder = new flatbuffers.Builder();
 
   const filename_ = builder.createString(filename);
   const sourceCode_ = builder.createString(sourceCode);

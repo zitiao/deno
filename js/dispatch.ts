@@ -17,19 +17,6 @@ export function sub(channel: string, cb: MessageCallback): void {
   subscribers.push(cb);
 }
 
-/*
-export function subMsg(channel: string, cb: MessageStructCallback): void {
-  sub(channel, (payload: Uint8Array) => {
-    const msg = pb.Msg.decode(payload);
-    if (msg.error != null) {
-      f.onError(new Error(msg.error));
-    } else {
-      cb(msg);
-    }
-  });
-}
-  */
-
 deno.recv((channel: string, ab: ArrayBuffer) => {
   const subscribers = channels.get(channel);
   if (subscribers == null) {

@@ -389,9 +389,9 @@ static getRootAsCodeFetchRes(bb:flatbuffers.ByteBuffer, obj?:CodeFetchRes):CodeF
  * @param {flatbuffers.Encoding=} optionalEncoding
  * @returns {string|Uint8Array|null}
  */
-resModuleName():string|null
-resModuleName(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-resModuleName(optionalEncoding?:any):string|Uint8Array|null {
+moduleName():string|null
+moduleName(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
+moduleName(optionalEncoding?:any):string|Uint8Array|null {
   var offset = this.bb!.__offset(this.bb_pos, 4);
   return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 };
@@ -400,9 +400,9 @@ resModuleName(optionalEncoding?:any):string|Uint8Array|null {
  * @param {flatbuffers.Encoding=} optionalEncoding
  * @returns {string|Uint8Array|null}
  */
-resFilename():string|null
-resFilename(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-resFilename(optionalEncoding?:any):string|Uint8Array|null {
+filename():string|null
+filename(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
+filename(optionalEncoding?:any):string|Uint8Array|null {
   var offset = this.bb!.__offset(this.bb_pos, 6);
   return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 };
@@ -411,9 +411,9 @@ resFilename(optionalEncoding?:any):string|Uint8Array|null {
  * @param {flatbuffers.Encoding=} optionalEncoding
  * @returns {string|Uint8Array|null}
  */
-resSourceCode():string|null
-resSourceCode(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-resSourceCode(optionalEncoding?:any):string|Uint8Array|null {
+sourceCode():string|null
+sourceCode(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
+sourceCode(optionalEncoding?:any):string|Uint8Array|null {
   var offset = this.bb!.__offset(this.bb_pos, 8);
   return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 };
@@ -422,9 +422,9 @@ resSourceCode(optionalEncoding?:any):string|Uint8Array|null {
  * @param {flatbuffers.Encoding=} optionalEncoding
  * @returns {string|Uint8Array|null}
  */
-resOutputCode():string|null
-resOutputCode(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-resOutputCode(optionalEncoding?:any):string|Uint8Array|null {
+outputCode():string|null
+outputCode(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
+outputCode(optionalEncoding?:any):string|Uint8Array|null {
   var offset = this.bb!.__offset(this.bb_pos, 10);
   return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 };
@@ -438,34 +438,34 @@ static startCodeFetchRes(builder:flatbuffers.Builder) {
 
 /**
  * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} resModuleNameOffset
+ * @param {flatbuffers.Offset} moduleNameOffset
  */
-static addResModuleName(builder:flatbuffers.Builder, resModuleNameOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(0, resModuleNameOffset, 0);
+static addModuleName(builder:flatbuffers.Builder, moduleNameOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(0, moduleNameOffset, 0);
 };
 
 /**
  * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} resFilenameOffset
+ * @param {flatbuffers.Offset} filenameOffset
  */
-static addResFilename(builder:flatbuffers.Builder, resFilenameOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(1, resFilenameOffset, 0);
+static addFilename(builder:flatbuffers.Builder, filenameOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(1, filenameOffset, 0);
 };
 
 /**
  * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} resSourceCodeOffset
+ * @param {flatbuffers.Offset} sourceCodeOffset
  */
-static addResSourceCode(builder:flatbuffers.Builder, resSourceCodeOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(2, resSourceCodeOffset, 0);
+static addSourceCode(builder:flatbuffers.Builder, sourceCodeOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(2, sourceCodeOffset, 0);
 };
 
 /**
  * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} resOutputCodeOffset
+ * @param {flatbuffers.Offset} outputCodeOffset
  */
-static addResOutputCode(builder:flatbuffers.Builder, resOutputCodeOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(3, resOutputCodeOffset, 0);
+static addOutputCode(builder:flatbuffers.Builder, outputCodeOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(3, outputCodeOffset, 0);
 };
 
 /**

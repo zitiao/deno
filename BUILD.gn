@@ -99,8 +99,16 @@ flatbuffer("msg_cpp") {
 run_node("bundle") {
   out_dir = "$target_gen_dir/bundle/"
   sources = [
+    "js/console.ts",
+    "js/deno.d.ts",
+    "js/dispatch.ts",
+    "js/globals.ts",
     "js/main.ts",
     "js/msg_generated.ts",
+    "js/os.ts",
+    "js/runtime.ts",
+    "js/types.ts",
+    "js/util.ts",
     "js/package.json",  # The `browserslist` field controls Babel behavior.
   ]
   outputs = [

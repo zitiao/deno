@@ -2,7 +2,7 @@
   "compilerOptions": {
     "allowJs": true,
     "module": "commonjs",
-    //"noImplicitAny": true,
+    "noImplicitAny": true,
     "sourceMap": true,
     "removeComments": true,
     "preserveConstEnums": true,
