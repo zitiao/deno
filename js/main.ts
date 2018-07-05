@@ -4,6 +4,9 @@ import * as ts from "typescript";
 
 import { flatbuffers } from "flatbuffers";
 import { deno as fbs } from "./msg_generated";
+import { assert } from "./util";
+
+import * as runtime from "./runtime";
 
 const globalEval = eval;
 const window = globalEval("this");
@@ -15,19 +18,28 @@ window["denoMain"] = () => {
   const resUi8 = new Uint8Array(res);
 
   const bb = new flatbuffers.ByteBuffer(resUi8);
-  const msg = fbs.Msg.getRootAsMsg(bb);
+  const base = fbs.Base.getRootAsBase(bb);
+
+  assert(fbs.Any.Start === base.msgType());
+  const startMsg = new fbs.Start();
+  assert(base.msg(startMsg) != null);
 
   // startDebugFlag: debugFlag,
   // startMainJs: mainJs,
   // startMainMap: mainMap
-  const cwd = msg.startCwd();
+  const cwd = startMsg.cwd();
   deno.print(`cwd: ${cwd}`);
 
   const argv: string[] = [];
-  for (let i = 0; i < msg.startArgvLength(); i++) {
-    const arg = msg.startArgv(i);
+  for (let i = 0; i < startMsg.argvLength(); i++) {
+    const arg = startMsg.argv(i);
+    argv.push(arg);
     deno.print(`argv[${i}] ${arg}`);
   }
+
+  const inputFn = argv[0];
+  const mod = runtime.resolveModule(inputFn, `${cwd}/`);
+  mod.compileAndRun();
 };
 
 function typedArrayToArrayBuffer(ta: Uint8Array): ArrayBuffer {

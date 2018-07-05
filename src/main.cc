@@ -34,13 +34,10 @@ void MessagesFromJS(Deno* d, const char* channel, deno_buf buf) {
   }
   auto start_argv = builder.CreateVector(args);
 
-  deno::MsgBuilder msg_builder(builder);
-  msg_builder.add_command(deno::Command_START);
-  msg_builder.add_start_cwd(start_cwd);
-  msg_builder.add_start_argv(start_argv);
+  auto start_msg = deno::CreateStart(builder, start_cwd, start_argv);
 
-  auto response = msg_builder.Finish();
-  builder.Finish(response);
+  auto base = deno::CreateBase(builder, 0, deno::Any_Start, start_msg.Union());
+  builder.Finish(base);
 
   deno_buf bufout{reinterpret_cast<const char*>(builder.GetBufferPointer()),
                   builder.GetSize()};
