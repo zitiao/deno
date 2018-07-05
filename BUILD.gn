@@ -106,10 +106,10 @@ run_node("bundle") {
     "js/main.ts",
     "js/msg_generated.ts",
     "js/os.ts",
+    "js/package.json",  # The `browserslist` field controls Babel behavior.
     "js/runtime.ts",
     "js/types.ts",
     "js/util.ts",
-    "js/package.json",  # The `browserslist` field controls Babel behavior.
   ]
   outputs = [
     out_dir + "main.js",
