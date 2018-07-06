@@ -11,28 +11,37 @@ import * as runtime from "./runtime";
 const globalEval = eval;
 const window = globalEval("this");
 
+function startMsg(): ArrayBuffer {
+  const builder = new flatbuffers.Builder();
+  const msg = fbs.Start.createStart(builder, 0);
+  fbs.Base.startBase(builder);
+  fbs.Base.addMsg(builder, msg);
+  builder.finish(fbs.Base.endBase(builder));
+  return typedArrayToArrayBuffer(builder.asUint8Array());
+}
+
 window["denoMain"] = () => {
   deno.print(`ts.version: ${ts.version}`);
-  const res = deno.send("startDeno2", emptyArrayBuffer());
+  const res = deno.send("start", startMsg());
   // deno.print(`after`);
   const resUi8 = new Uint8Array(res);
 
   const bb = new flatbuffers.ByteBuffer(resUi8);
   const base = fbs.Base.getRootAsBase(bb);
 
-  assert(fbs.Any.Start === base.msgType());
-  const startMsg = new fbs.Start();
-  assert(base.msg(startMsg) != null);
+  assert(fbs.Any.StartRes === base.msgType());
+  const startResMsg = new fbs.StartRes();
+  assert(base.msg(startResMsg) != null);
 
   // startDebugFlag: debugFlag,
   // startMainJs: mainJs,
   // startMainMap: mainMap
-  const cwd = startMsg.cwd();
+  const cwd = startResMsg.cwd();
   deno.print(`cwd: ${cwd}`);
 
   const argv: string[] = [];
-  for (let i = 0; i < startMsg.argvLength(); i++) {
-    const arg = startMsg.argv(i);
+  for (let i = 0; i < startResMsg.argvLength(); i++) {
+    const arg = startResMsg.argv(i);
     argv.push(arg);
     deno.print(`argv[${i}] ${arg}`);
   }
@@ -47,8 +56,4 @@ function typedArrayToArrayBuffer(ta: Uint8Array): ArrayBuffer {
     ta.byteOffset,
     ta.byteOffset + ta.byteLength
   ) as ArrayBuffer;
-}
-
-function emptyArrayBuffer(): ArrayBuffer {
-  return typedArrayToArrayBuffer(new Uint8Array([]));
 }

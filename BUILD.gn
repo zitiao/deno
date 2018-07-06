@@ -8,6 +8,9 @@ import("rust.gni")
 config("deno_config") {
   include_dirs = [ "third_party/v8" ]  # This allows us to v8/src/base/ libraries.
   configs = [ "third_party/v8:external_config" ]
+  if (is_debug) {
+    defines = [ "DEBUG" ]
+  }
 }
 
 rust_executable("deno") {

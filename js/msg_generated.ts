@@ -7,18 +7,19 @@ export namespace deno{
 export enum Any{
   NONE= 0,
   Start= 1,
-  CodeFetch= 2,
-  CodeFetchRes= 3,
-  CodeCache= 4,
-  Exit= 5,
-  TimerStart= 6,
-  TimerReady= 7,
-  TimerClear= 8,
-  FetchReq= 9,
-  FetchRes= 10,
-  ReadFileSync= 11,
-  ReadFileSyncRes= 12,
-  WriteFileSync= 13
+  StartRes= 2,
+  CodeFetch= 3,
+  CodeFetchRes= 4,
+  CodeCache= 5,
+  Exit= 6,
+  TimerStart= 7,
+  TimerReady= 8,
+  TimerClear= 9,
+  FetchReq= 10,
+  FetchRes= 11,
+  ReadFileSync= 12,
+  ReadFileSyncRes= 13,
+  WriteFileSync= 14
 }};
 
 /**
@@ -72,6 +73,21 @@ error(optionalEncoding?:any):string|Uint8Array|null {
 msgType():deno.Any {
   var offset = this.bb!.__offset(this.bb_pos, 6);
   return offset ? /** @type {deno.Any} */ (this.bb!.readUint8(this.bb_pos + offset)) : deno.Any.NONE;
+};
+
+/**
+ * @param {deno.Any} value
+ * @returns {boolean}
+ */
+mutate_msg_type(value:deno.Any):boolean {
+  var offset = this.bb!.__offset(this.bb_pos, 6);
+
+  if (offset === 0) {
+    return false;
+  }
+
+  this.bb!.writeUint8(this.bb_pos + offset, value);
+  return true;
 };
 
 /**
@@ -151,12 +167,72 @@ __init(i:number, bb:flatbuffers.ByteBuffer):Start {
 };
 
 /**
- * @param {flatbuffers.ByteBuffer} bb
- * @param {Start=} obj
- * @returns {Start}
+ * @returns {number}
  */
-static getRootAsStart(bb:flatbuffers.ByteBuffer, obj?:Start):Start {
-  return (obj || new Start).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+unused():number {
+  return this.bb!.readInt8(this.bb_pos);
+};
+
+/**
+ * @param {number} value
+ * @returns {boolean}
+ */
+mutate_unused(value:number):boolean {
+  var offset = this.bb!.__offset(this.bb_pos, 0);
+
+  if (offset === 0) {
+    return false;
+  }
+
+  this.bb!.writeInt8(this.bb_pos + offset, value);
+  return true;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {number} unused
+ * @returns {flatbuffers.Offset}
+ */
+static createStart(builder:flatbuffers.Builder, unused: number):flatbuffers.Offset {
+  builder.prep(1, 1);
+  builder.writeInt8(unused);
+  return builder.offset();
+};
+
+}
+}
+/**
+ * @constructor
+ */
+export namespace deno{
+export class StartRes {
+  /**
+   * @type {flatbuffers.ByteBuffer}
+   */
+  bb: flatbuffers.ByteBuffer|null = null;
+
+  /**
+   * @type {number}
+   */
+  bb_pos:number = 0;
+/**
+ * @param {number} i
+ * @param {flatbuffers.ByteBuffer} bb
+ * @returns {StartRes}
+ */
+__init(i:number, bb:flatbuffers.ByteBuffer):StartRes {
+  this.bb_pos = i;
+  this.bb = bb;
+  return this;
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {StartRes=} obj
+ * @returns {StartRes}
+ */
+static getRootAsStartRes(bb:flatbuffers.ByteBuffer, obj?:StartRes):StartRes {
+  return (obj || new StartRes).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 
 /**
@@ -199,9 +275,24 @@ debugFlag():boolean {
 };
 
 /**
+ * @param {boolean} value
+ * @returns {boolean}
+ */
+mutate_debug_flag(value:boolean):boolean {
+  var offset = this.bb!.__offset(this.bb_pos, 8);
+
+  if (offset === 0) {
+    return false;
+  }
+
+  this.bb!.writeInt8(this.bb_pos + offset, +value);
+  return true;
+};
+
+/**
  * @param {flatbuffers.Builder} builder
  */
-static startStart(builder:flatbuffers.Builder) {
+static startStartRes(builder:flatbuffers.Builder) {
   builder.startObject(3);
 };
 
@@ -254,7 +345,7 @@ static addDebugFlag(builder:flatbuffers.Builder, debugFlag:boolean) {
  * @param {flatbuffers.Builder} builder
  * @returns {flatbuffers.Offset}
  */
-static endStart(builder:flatbuffers.Builder):flatbuffers.Offset {
+static endStartRes(builder:flatbuffers.Builder):flatbuffers.Offset {
   var offset = builder.endObject();
   return offset;
 };
@@ -621,6 +712,21 @@ code():number {
 };
 
 /**
+ * @param {number} value
+ * @returns {boolean}
+ */
+mutate_code(value:number):boolean {
+  var offset = this.bb!.__offset(this.bb_pos, 0);
+
+  if (offset === 0) {
+    return false;
+  }
+
+  this.bb!.writeInt32(this.bb_pos + offset, value);
+  return true;
+};
+
+/**
  * @param {flatbuffers.Builder} builder
  * @param {number} code
  * @returns {flatbuffers.Offset}
@@ -666,6 +772,21 @@ id():number {
 };
 
 /**
+ * @param {number} value
+ * @returns {boolean}
+ */
+mutate_id(value:number):boolean {
+  var offset = this.bb!.__offset(this.bb_pos, 0);
+
+  if (offset === 0) {
+    return false;
+  }
+
+  this.bb!.writeUint32(this.bb_pos + offset, value);
+  return true;
+};
+
+/**
  * @returns {boolean}
  */
 interval():boolean {
@@ -673,10 +794,40 @@ interval():boolean {
 };
 
 /**
+ * @param {boolean} value
+ * @returns {boolean}
+ */
+mutate_interval(value:boolean):boolean {
+  var offset = this.bb!.__offset(this.bb_pos, 4);
+
+  if (offset === 0) {
+    return false;
+  }
+
+  this.bb!.writeInt8(this.bb_pos + offset, +value);
+  return true;
+};
+
+/**
  * @returns {number}
  */
 delay():number {
   return this.bb!.readInt32(this.bb_pos + 8);
+};
+
+/**
+ * @param {number} value
+ * @returns {boolean}
+ */
+mutate_delay(value:number):boolean {
+  var offset = this.bb!.__offset(this.bb_pos, 8);
+
+  if (offset === 0) {
+    return false;
+  }
+
+  this.bb!.writeInt32(this.bb_pos + offset, value);
+  return true;
 };
 
 /**
@@ -730,10 +881,40 @@ id():number {
 };
 
 /**
+ * @param {number} value
+ * @returns {boolean}
+ */
+mutate_id(value:number):boolean {
+  var offset = this.bb!.__offset(this.bb_pos, 0);
+
+  if (offset === 0) {
+    return false;
+  }
+
+  this.bb!.writeUint32(this.bb_pos + offset, value);
+  return true;
+};
+
+/**
  * @returns {boolean}
  */
 done():boolean {
   return !!this.bb!.readInt8(this.bb_pos + 4);
+};
+
+/**
+ * @param {boolean} value
+ * @returns {boolean}
+ */
+mutate_done(value:boolean):boolean {
+  var offset = this.bb!.__offset(this.bb_pos, 4);
+
+  if (offset === 0) {
+    return false;
+  }
+
+  this.bb!.writeInt8(this.bb_pos + offset, +value);
+  return true;
 };
 
 /**
@@ -782,6 +963,21 @@ __init(i:number, bb:flatbuffers.ByteBuffer):TimerClear {
  */
 id():number {
   return this.bb!.readUint32(this.bb_pos);
+};
+
+/**
+ * @param {number} value
+ * @returns {boolean}
+ */
+mutate_id(value:number):boolean {
+  var offset = this.bb!.__offset(this.bb_pos, 0);
+
+  if (offset === 0) {
+    return false;
+  }
+
+  this.bb!.writeUint32(this.bb_pos + offset, value);
+  return true;
 };
 
 /**
@@ -837,6 +1033,21 @@ static getRootAsFetchReq(bb:flatbuffers.ByteBuffer, obj?:FetchReq):FetchReq {
 id():number {
   var offset = this.bb!.__offset(this.bb_pos, 4);
   return offset ? this.bb!.readUint32(this.bb_pos + offset) : 0;
+};
+
+/**
+ * @param {number} value
+ * @returns {boolean}
+ */
+mutate_id(value:number):boolean {
+  var offset = this.bb!.__offset(this.bb_pos, 4);
+
+  if (offset === 0) {
+    return false;
+  }
+
+  this.bb!.writeUint32(this.bb_pos + offset, value);
+  return true;
 };
 
 /**
@@ -927,11 +1138,41 @@ id():number {
 };
 
 /**
+ * @param {number} value
+ * @returns {boolean}
+ */
+mutate_id(value:number):boolean {
+  var offset = this.bb!.__offset(this.bb_pos, 4);
+
+  if (offset === 0) {
+    return false;
+  }
+
+  this.bb!.writeUint32(this.bb_pos + offset, value);
+  return true;
+};
+
+/**
  * @returns {number}
  */
 status():number {
   var offset = this.bb!.__offset(this.bb_pos, 6);
   return offset ? this.bb!.readInt32(this.bb_pos + offset) : 0;
+};
+
+/**
+ * @param {number} value
+ * @returns {boolean}
+ */
+mutate_status(value:number):boolean {
+  var offset = this.bb!.__offset(this.bb_pos, 6);
+
+  if (offset === 0) {
+    return false;
+  }
+
+  this.bb!.writeInt32(this.bb_pos + offset, value);
+  return true;
 };
 
 /**
@@ -1324,6 +1565,21 @@ dataArray():Int8Array|null {
 perm():number {
   var offset = this.bb!.__offset(this.bb_pos, 8);
   return offset ? this.bb!.readUint32(this.bb_pos + offset) : 0;
+};
+
+/**
+ * @param {number} value
+ * @returns {boolean}
+ */
+mutate_perm(value:number):boolean {
+  var offset = this.bb!.__offset(this.bb_pos, 8);
+
+  if (offset === 0) {
+    return false;
+  }
+
+  this.bb!.writeUint32(this.bb_pos + offset, value);
+  return true;
 };
 
 /**

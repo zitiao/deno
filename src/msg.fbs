@@ -2,6 +2,7 @@ namespace deno;
 
 union Any { 
   Start,
+  StartRes,
   CodeFetch,
   CodeFetchRes,
   CodeCache,
@@ -21,7 +22,11 @@ table Base {
   msg: Any;
 }
 
-table Start {
+struct Start {
+  unused: int8;
+}
+
+table StartRes {
   cwd: string;
   argv: [string];
   debug_flag: bool;

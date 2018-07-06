@@ -31,9 +31,7 @@ export function codeFetch(
   const msg = fbs.CodeCache.endCodeCache(builder);
   fbs.Base.startBase(builder);
   fbs.Base.addMsg(builder, msg);
-  const base = fbs.Base.endBase(builder);
-  // Maybe need to do another step?
-  // Base.finishBaseBuffer(builder, base);
+  builder.finish(fbs.Base.endBase(builder));
 	const payload = typedArrayToArrayBuffer(builder.asUint8Array());
   const resBuf = deno.send("x", payload);
 

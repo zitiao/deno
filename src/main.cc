@@ -18,9 +18,8 @@
 static char** global_argv;
 static int global_argc;
 
-void MessagesFromJS(Deno* d, const char* channel, deno_buf buf) {
-  printf("MessagesFromJS %s\n", channel);
-
+// Sends StartRes message
+void HandleStart(Deno* d) {
   flatbuffers::FlatBufferBuilder builder;
 
   char cwdbuf[1024];
@@ -32,16 +31,29 @@ void MessagesFromJS(Deno* d, const char* channel, deno_buf buf) {
   for (int i = 0; i < global_argc; ++i) {
     args.push_back(builder.CreateString(global_argv[i]));
   }
+
   auto start_argv = builder.CreateVector(args);
-
-  auto start_msg = deno::CreateStart(builder, start_cwd, start_argv);
-
-  auto base = deno::CreateBase(builder, 0, deno::Any_Start, start_msg.Union());
+  auto start_msg = deno::CreateStartRes(builder, start_cwd, start_argv);
+  auto base =
+      deno::CreateBase(builder, 0, deno::Any_StartRes, start_msg.Union());
   builder.Finish(base);
-
   deno_buf bufout{reinterpret_cast<const char*>(builder.GetBufferPointer()),
                   builder.GetSize()};
   deno_set_response(d, bufout);
+}
+
+void MessagesFromJS(Deno* d, const char* channel, deno_buf buf) {
+  flatbuffers::Verifier verifier(reinterpret_cast<const uint8_t*>(buf.data),
+                                 buf.len);
+  DCHECK(verifier.VerifyBuffer<deno::Base>());
+
+  auto base = flatbuffers::GetRoot<deno::Base>(buf.data);
+  auto msg_type = base->msg_type();
+  const char* msg_type_name = deno::EnumNamesAny()[msg_type];
+  printf("MessagesFromJS channel %s, msg_type = %d, msg_type_name = %s\n",
+      channel, msg_type, msg_type_name);
+
+  HandleStart(d);
 }
 
 int main(int argc, char** argv) {
